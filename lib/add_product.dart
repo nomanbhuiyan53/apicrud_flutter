@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class AddProduct extends StatefulWidget {
   @override
@@ -102,6 +103,15 @@ class _AddProductState extends State<AddProduct> {
   Future<void> _productStore() async{
     String url = 'https://crud.teamrabbil.com/api/v1/CreateProduct';
     Uri uri = Uri.parse(url);
+    Map<String,dynamic> data ={
+      "Img":_imageController.text,
+      "ProductCode":_codeController.text,
+      "ProductName":_nameController.text,
+      "Qty":_qtyController.text,
+      "TotalPrice":_totalPriceController.text,
+      "UnitPrice":_unitPriceController.text
+    };
+    Response response = await post(uri);
   }
 
   @override

@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
 class AddProduct extends StatefulWidget {
+  const AddProduct({super.key});
+
   @override
   State<AddProduct> createState() => _AddProductState();
 }
@@ -14,6 +19,8 @@ class _AddProductState extends State<AddProduct> {
   final TextEditingController _qtyController = TextEditingController();
   final TextEditingController _totalPriceController = TextEditingController();
   final TextEditingController _createdDateController = TextEditingController();
+
+  bool _addproductInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +69,17 @@ class _AddProductState extends State<AddProduct> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _createdDateController,
-                decoration: const InputDecoration(
-                  labelText: 'Created Date',
+              GestureDetector(
+                onTap: () {
+                  _selectDate(context);
+                },
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: _createdDateController,
+                    decoration: const InputDecoration(
+                      labelText: 'Created Date',
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 16.0),
@@ -76,31 +90,51 @@ class _AddProductState extends State<AddProduct> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Background color
-                  foregroundColor: Colors.white, // Text color
-                  shadowColor: Colors.black, // Shadow color
-                  elevation: 5, // Elevation of the button
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12), // Rounded corners
+                Visibility(
+                  visible: _addproductInProgress == false,
+                  replacement:const Center(
+                    child: CircularProgressIndicator(),
+                  ) ,
+                  child: ElevatedButton(
+                  onPressed: () {
+                    _productStore();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green, // Background color
+                    foregroundColor: Colors.white, // Text color
+                    shadowColor: Colors.black, // Shadow color
+                    elevation: 5, // Elevation of the button
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // Rounded corners
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Padding inside the button
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Padding inside the button
-                ),
-                child: const Text('Submit'),
+                  child: const Text('Submit'),
 
-              ),
+                  ),
+                ),
             ],
           ),
         ),
       ),
     );
   }
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _createdDateController.text = pickedDate.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
 
   Future<void> _productStore() async{
+    bool _addproductInProgress = true;
     String url = 'https://crud.teamrabbil.com/api/v1/CreateProduct';
     Uri uri = Uri.parse(url);
     Map<String,dynamic> data ={
@@ -111,7 +145,22 @@ class _AddProductState extends State<AddProduct> {
       "TotalPrice":_totalPriceController.text,
       "UnitPrice":_unitPriceController.text
     };
-    Response response = await post(uri);
+    Response response = await post(uri,body: jsonEncode(data) ,headers: {'Content-Type':'application/json'});
+    print(response.statusCode);
+    if(response.statusCode == 200){
+      _nameController.clear();
+      _codeController.clear();
+      _imageController.clear();
+      _unitPriceController.clear();
+      _qtyController.clear();
+      _totalPriceController.clear();
+      _createdDateController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product store success')));
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add Product failed ! Try Aging')));
+    }
+    setState(() {
+    });
   }
 
   @override

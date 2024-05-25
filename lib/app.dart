@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:api_prectice/add_product.dart';
 import 'package:api_prectice/product_item.dart';
+import 'package:api_prectice/update_product.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -31,41 +32,47 @@ class ProductListState extends State<ProductList> {
       appBar: AppBar(
         title: const Text('Product List'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 200,
-            child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => AddProduct(),
-                    ),
-                  );
-                },
-                child: const Row(
-                  children: [ Icon(Icons.add), Text('Add New Product')],
-                )),
-          ),
-          const Divider(),
-          Expanded(
-            child: Visibility(
-              visible: _getProductList == false,
-              replacement: const Center(
-                child: CircularProgressIndicator(),
-              ),
-              child: ListView.separated(
-                itemCount: productItem.length,
-                separatorBuilder: (BuildContext context, int index) =>
-                    const Divider(),
-                itemBuilder: (BuildContext context, int index) {
-                  return _productListView(productItem[index]);
-                },
+      body: RefreshIndicator(
+        onRefresh: _productList,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                  onPressed: () async {
+                   final result = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => AddProduct(),
+                      ),
+                    );
+                   if(result){
+                     _productList();
+                   }
+                  },
+                  child: const Row(
+                    children: [ Icon(Icons.add), Text('Add New Product')],
+                  )),
+            ),
+            const Divider(),
+            Expanded(
+              child: Visibility(
+                visible: _getProductList == false,
+                replacement: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                child: ListView.separated(
+                  itemCount: productItem.length,
+                  separatorBuilder: (BuildContext context, int index) =>
+                      const Divider(),
+                  itemBuilder: (BuildContext context, int index) {
+                    return _productListView(productItem[index]);
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -78,13 +85,18 @@ class ProductListState extends State<ProductList> {
         Text('Quantity: ${products.qty}'),
         Text('Total Price: ${products.totalPrice}')
       ]),
-      leading: const Icon(
-        Icons.image,
-        size: 36,
+      leading: SizedBox(
+        height: 50,
+        child: Image.network(products.image),
       ),
       trailing: Wrap(
         children: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+          IconButton(onPressed: () async {
+           final result = await  Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateProduct(products: products),));
+           if(result){
+             _productList();
+           }
+          }, icon: const Icon(Icons.edit)),
           IconButton(
             onPressed: () {
               _confirmDelete(products);

@@ -5,14 +5,14 @@ import 'package:api_prectice/product_item.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
-class AddProduct extends StatefulWidget {
-  const AddProduct({super.key});
-
+class UpdateProduct extends StatefulWidget {
+  const UpdateProduct({super.key,  required this.products});
+  final Products products;
   @override
-  State<AddProduct> createState() => _AddProductState();
+  State<UpdateProduct> createState() => _UpdateProductState();
 }
 
-class _AddProductState extends State<AddProduct> {
+class _UpdateProductState extends State<UpdateProduct> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
   final TextEditingController _imageController = TextEditingController();
@@ -24,6 +24,17 @@ class _AddProductState extends State<AddProduct> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _addproductInProgress = false;
 
+  @override
+  void initState() {
+    _nameController.text = widget.products.name;
+    _codeController.text = widget.products.code;
+    _imageController.text =  widget.products.image;
+    _unitPriceController.text =  widget.products.unitPrice;
+    _qtyController.text =  widget.products.qty;
+    _totalPriceController.text =  widget.products.totalPrice;
+    _createdDateController.text =  widget.products.createdDate;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +46,7 @@ class _AddProductState extends State<AddProduct> {
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Form(
-            key:_formKey,
+            key: _formKey,
             child: Column(
               children: [
                 TextFormField(
@@ -58,12 +69,12 @@ class _AddProductState extends State<AddProduct> {
                   decoration: const InputDecoration(
                     labelText: 'Code',
                   ),
-                    validator: (String? value) {
-                      if(value == null || value.trim().isEmpty){
-                        return 'Write your product Code';
-                      }
-                      return null;
-                    },
+                  validator: (String? value) {
+                    if(value == null || value.trim().isEmpty){
+                      return 'Write your product Code';
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16.0),
@@ -73,12 +84,12 @@ class _AddProductState extends State<AddProduct> {
                   decoration: const InputDecoration(
                     labelText: 'Unit Price',
                   ),
-                    validator: (String? value) {
-                      if(value == null || value.trim().isEmpty){
-                        return 'Write your product Unit Price';
-                      }
-                      return null;
-                    },
+                  validator: (String? value) {
+                    if(value == null || value.trim().isEmpty){
+                      return 'Write your product Unit Price';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
@@ -86,19 +97,19 @@ class _AddProductState extends State<AddProduct> {
                   decoration: const InputDecoration(
                     labelText: 'Quantity',
                   ),
-                    validator: (String? value) {
-                      if(value == null || value.trim().isEmpty){
-                        return 'Write your product Quantity';
-                      }
-                      return null;
-                    },
+                  validator: (String? value) {
+                    if(value == null || value.trim().isEmpty){
+                      return 'Write your product Quantity';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
-                  controller: _totalPriceController,
-                  decoration: const InputDecoration(
-                    labelText: 'Total Price',
-                  ),
+                    controller: _totalPriceController,
+                    decoration: const InputDecoration(
+                      labelText: 'Total Price',
+                    ),
                     validator: (String? value) {
                       if(value == null || value.trim().isEmpty){
                         return 'Write your product Total Price';
@@ -117,12 +128,12 @@ class _AddProductState extends State<AddProduct> {
                       decoration: const InputDecoration(
                         labelText: 'Created Date',
                       ),
-                        validator: (String? value) {
-                          if(value == null || value.trim().isEmpty){
-                            return 'Pick Your Date';
-                          }
-                          return null;
-                        },
+                      validator: (String? value) {
+                        if(value == null || value.trim().isEmpty){
+                          return 'Pick Your Date';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ),
@@ -134,15 +145,15 @@ class _AddProductState extends State<AddProduct> {
                   ),
                 ),
                 const SizedBox(height: 16.0),
-                  Visibility(
-                    visible: _addproductInProgress == false,
-                    replacement:const Center(
-                      child: CircularProgressIndicator(),
-                    ) ,
-                    child: ElevatedButton(
+                Visibility(
+                  visible: _addproductInProgress == false,
+                  replacement:const Center(
+                    child: CircularProgressIndicator(),
+                  ) ,
+                  child: ElevatedButton(
                     onPressed: () {
                       if(_formKey.currentState!.validate()){
-                        _productStore();
+                        _productUpdate();
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -156,8 +167,8 @@ class _AddProductState extends State<AddProduct> {
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Padding inside the button
                     ),
                     child: const Text('Submit'),
-                    ),
                   ),
+                ),
               ],
             ),
           ),
@@ -179,9 +190,9 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
-  Future<void> _productStore() async{
+  Future<void> _productUpdate() async{
     bool _addproductInProgress = true;
-    String url = 'https://crud.teamrabbil.com/api/v1/CreateProduct';
+    String url = 'https://crud.teamrabbil.com/api/v1/UpdateProduct/${widget.products.id}';
     Uri uri = Uri.parse(url);
     Map<String,dynamic> data ={
       "Img":_imageController.text,
@@ -192,19 +203,12 @@ class _AddProductState extends State<AddProduct> {
       "UnitPrice":_unitPriceController.text
     };
     Response response = await post(uri,body: jsonEncode(data) ,headers: {'Content-Type':'application/json'});
-    print(response.statusCode);
+
     if(response.statusCode == 200){
-      _nameController.clear();
-      _codeController.clear();
-      _imageController.clear();
-      _unitPriceController.clear();
-      _qtyController.clear();
-      _totalPriceController.clear();
-      _createdDateController.clear();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product store success')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product Update success')));
       Navigator.pop(context, true);
     }else{
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add Product failed ! Try Aging')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Update Product failed ! Try Aging')));
     }
     setState(() {
     });

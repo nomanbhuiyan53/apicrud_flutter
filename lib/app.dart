@@ -86,9 +86,14 @@ class ProductListState extends State<ProductList> {
         Text('Total Price: ${products.totalPrice}')
       ]),
       leading: SizedBox(
-        height: 50,
-        child: Image.network(products.image),
+        height: 80,
+        width: 80,
+        child: Image.network(
+          products.image,
+          fit: BoxFit.cover,
+        ),
       ),
+
       trailing: Wrap(
         children: [
           IconButton(onPressed: () async {

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:api_prectice/add_product.dart';
 import 'package:api_prectice/product_item.dart';
 import 'package:api_prectice/update_product.dart';
@@ -38,7 +37,7 @@ class ProductListState extends State<ProductList> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              width: 200,
+              width: 250,
               child: ElevatedButton(
                   onPressed: () async {
                    final result = await Navigator.of(context).push(
@@ -50,6 +49,11 @@ class ProductListState extends State<ProductList> {
                      _productList();
                    }
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.yellow,
+                    padding: EdgeInsets.all(10),
+                    shape: const BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))
+                  ),
                   child: const Row(
                     children: [ Icon(Icons.add), Text('Add New Product')],
                   )),
@@ -61,12 +65,16 @@ class ProductListState extends State<ProductList> {
                 replacement: const Center(
                   child: CircularProgressIndicator(),
                 ),
-                child: ListView.separated(
+                child: ListView.builder(
                   itemCount: productItem.length,
-                  separatorBuilder: (BuildContext context, int index) =>
-                      const Divider(),
                   itemBuilder: (BuildContext context, int index) {
-                    return _productListView(productItem[index]);
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        color: Colors.white,
+                          child: _productListView(productItem[index]),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -85,14 +93,7 @@ class ProductListState extends State<ProductList> {
         Text('Quantity: ${products.qty}'),
         Text('Total Price: ${products.totalPrice}')
       ]),
-      leading: SizedBox(
-        height: 80,
-        width: 80,
-        child: Image.network(
-          products.image,
-          fit: BoxFit.cover,
-        ),
-      ),
+      leading:  ProductImage(imageUrl: products.image),
 
       trailing: Wrap(
         children: [
@@ -198,5 +199,53 @@ class ProductListState extends State<ProductList> {
     if (confirm == true) {
       _deleteProduct(product.id);
     }
+  }
+}
+class ProductImage extends StatelessWidget {
+  final String imageUrl;
+
+  ProductImage({required this.imageUrl});
+
+  Future<bool> isValidImageUrl(String url) async {
+    try {
+      final response = await head(Uri.parse(url));
+      return response.statusCode == 200 && response.headers['content-type']?.startsWith('image/') == true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: isValidImageUrl(imageUrl),
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Display a loading spinner while the URL is being validated
+          return const SizedBox(
+            height: 80,
+            width: 80,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        } else if (snapshot.hasError || !snapshot.data!) {
+          // Display an error widget or placeholder image if the URL is not valid
+          return const SizedBox(
+            height: 80,
+            width: 80,
+            child: Center(child: Icon(Icons.image)),
+          );
+        } else {
+          // Display the image if the URL is valid
+          return SizedBox(
+            height: 80,
+            width: 80,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+            ),
+          );
+        }
+      },
+    );
   }
 }

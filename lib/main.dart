@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'app.dart';
 
 void main(){
-  runApp( MyApp());
+  runApp( const MyApp());
 }
 
 class MyApp extends StatelessWidget{
@@ -14,46 +14,50 @@ class MyApp extends StatelessWidget{
       debugShowCheckedModeBanner: false,
       title: "crud",
       theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
         inputDecorationTheme: InputDecorationTheme(
-          labelStyle: TextStyle(color: Colors.grey),
+          labelStyle: const TextStyle(color: Colors.grey),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.greenAccent,
               width: 2.0,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.green,
               width: 2.0,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.green,
               width: 2.0,
             ),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.red,
               width: 2.0,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(
+            borderSide: const BorderSide(
               color: Colors.redAccent,
               width: 2.0,
             ),
           ),
         )
       ),
-      home: ProductList(),
+      home: const ProductList(),
     );
   }
 

@@ -55,7 +55,8 @@ class ProductListState extends State<ProductList> {
                     shape: const BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(3)))
                   ),
                   child: const Row(
-                    children: [ Icon(Icons.add), Text('Add New Product')],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [ Icon(Icons.add,size: 25), Text('Add New Product',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),)],
                   )),
             ),
             const Divider(),
@@ -71,7 +72,8 @@ class ProductListState extends State<ProductList> {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Card(
-                        color: Colors.white,
+                        color: Colors.green.shade50,
+                          elevation: 9,
                           child: _productListView(productItem[index]),
                       ),
                     );
@@ -102,12 +104,12 @@ class ProductListState extends State<ProductList> {
            if(result){
              _productList();
            }
-          }, icon: const Icon(Icons.edit)),
+          }, icon: const Icon(Icons.edit,color: Colors.teal,size: 30,)),
           IconButton(
             onPressed: () {
               _confirmDelete(products);
             },
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete,color: Colors.deepOrange,size: 30,),
           )
         ],
       ),

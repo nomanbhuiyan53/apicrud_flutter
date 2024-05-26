@@ -67,6 +67,7 @@ class _AddProductState extends State<AddProduct> {
                 TextFormField(
                   controller: _unitPriceController,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Unit Price',
                   ),
@@ -80,6 +81,7 @@ class _AddProductState extends State<AddProduct> {
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: _qtyController,
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Quantity',
                   ),
@@ -93,6 +95,7 @@ class _AddProductState extends State<AddProduct> {
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: _totalPriceController,
+                    keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Total Price',
                   ),
